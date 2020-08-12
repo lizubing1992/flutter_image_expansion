@@ -4,14 +4,13 @@ package com.nongfadai.flutter_image_expansion;
 //import android.media.ExifInterface;
 
 import android.graphics.Bitmap;
+import android.graphics.Matrix;
 import android.util.Log;
 
 import androidx.exifinterface.media.ExifInterface;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
@@ -65,7 +64,6 @@ public class BitmapUtil {
 
         return longitude;
     }
-
 
     /**
      * 获取图片的纬度
@@ -181,6 +179,32 @@ public class BitmapUtil {
         return res;
     }
 
+    //获取图片旋转角度
+    public static String getImageOrientation(byte[] data) {
+        InputStream inputStream = new ByteArrayInputStream(data);
+        int degree = 0;
+        try {
+            ExifInterface exifInterface = new ExifInterface(inputStream);
+            int orientation = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+            switch (orientation) {
+                case ExifInterface.ORIENTATION_ROTATE_90:
+                    degree = 90;
+                    break;
+                case ExifInterface.ORIENTATION_ROTATE_180:
+                    degree = 180;
+                    break;
+                case ExifInterface.ORIENTATION_ROTATE_270:
+                    degree = 270;
+                    break;
+            }
+            Log.d("获取图片信息图片旋转角度: ", degree+"");
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.d("获取图片信息图片旋转角度IOException", e.getLocalizedMessage());
+        }
+        return degree + "";
+    }
+
     public static Map<String, String> getImageAllInfoFromData(byte[] data) {
         Map<String, String> res = new HashMap<>();
 
@@ -276,7 +300,24 @@ public class BitmapUtil {
             }
         }
         return os;
+    }
 
+    /**
+     * 旋转图片，使图片保持正确的方向。
+     *
+     * @param bitmap  原始图片
+     * @param degrees 原始图片的角度
+     * @return Bitmap 旋转后的图片
+     */
+    public static Bitmap rotateBitmap(Bitmap bitmap, int degrees) {
+        if (degrees == 0 || null == bitmap) {
+            return bitmap;
+        }
+        Matrix matrix = new Matrix();
+        matrix.setRotate(degrees, bitmap.getWidth() / 2, bitmap.getHeight() / 2);
+        Bitmap bmp = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+        bitmap.recycle();
+        return bmp;
     }
 
 

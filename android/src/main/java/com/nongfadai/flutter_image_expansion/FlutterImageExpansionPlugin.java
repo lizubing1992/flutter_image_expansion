@@ -3,16 +3,13 @@ package com.nongfadai.flutter_image_expansion;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
-import android.media.ExifInterface;
 import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -60,9 +57,12 @@ public class FlutterImageExpansionPlugin implements MethodCallHandler {
 //            boolean keepExif = call.argument("keepExif");
 //
 //            if (keepExif) {
-                imageExif = BitmapUtil.getImageAllInfoFromData(imageDataBytes);
+        String orientation = BitmapUtil.getImageOrientation(imageDataBytes);
+        Log.d("mrliuys 获取orientation: ", orientation);
 
-                Log.d("mrliuys 获取exif1: ", imageExif.toString());
+        imageExif = BitmapUtil.getImageAllInfoFromData(imageDataBytes);
+
+        Log.d("mrliuys 获取exif1: ", imageExif.toString());
 //            }
 //
 //        }
@@ -104,8 +104,7 @@ public class FlutterImageExpansionPlugin implements MethodCallHandler {
             result.success(res);
 
 
-        }
-        else if (call.method.equals("imageQuality")) {
+        } else if (call.method.equals("imageQuality")) {
 
             double quality = call.argument("quality");
 
@@ -155,6 +154,11 @@ public class FlutterImageExpansionPlugin implements MethodCallHandler {
         } else if (call.method.equals("getImagePhotoTime")) {
             result.success(BitmapUtil.getImagePhotoTimeFromData(imageDataBytes));
 
+        }else if (call.method.equals("getRotateImg")) {
+            result.success(getRotateImg(imageDataBytes,(int)call.argument("degree")));
+
+        }  else if (call.method.equals("getImageOrientation")) {
+            result.success(BitmapUtil.getImageOrientation(imageDataBytes));
         } else if (call.method.equals("getImageAllInfo")) {
             result.success(BitmapUtil.getImageAllInfoFromData(imageDataBytes));
         } else if (call.method.equals("saveImageInfo")) {
@@ -170,6 +174,18 @@ public class FlutterImageExpansionPlugin implements MethodCallHandler {
         } else {
             result.notImplemented();
         }
+    }
+
+
+    private byte[] getRotateImg(byte[] data,int degree){
+        Bitmap originBitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+        Bitmap rotateBitmap = BitmapUtil.rotateBitmap(originBitmap, degree);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        rotateBitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        byte[] resultByte = baos.toByteArray();
+        originBitmap.recycle();
+        rotateBitmap.recycle();
+        return resultByte;
     }
 
     private Bitmap imageZoomImage(Bitmap image, float maxImageLength) {

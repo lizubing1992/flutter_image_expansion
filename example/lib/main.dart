@@ -1,13 +1,10 @@
+import 'dart:async';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'dart:async';
-
-// import 'package:flutter/services.dart';
 import 'package:flutter_image_expansion/flutter_image_expansion.dart';
 import 'package:flutter_image_expansion/image_expansion_bean.dart';
-// import 'package:flutter_smart_cropper/flutter_smart_cropper.dart';
-
 import 'package:image_picker/image_picker.dart';
 
 void main() => runApp(MaterialApp(home: MyApp()));
@@ -18,7 +15,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  File _image;
+  PickedFile _image;
 
   ImageExpansionBean _originalImageBean;
   double _sliderValue;
@@ -28,6 +25,11 @@ class _MyAppState extends State<MyApp> {
 
   double _imageMaxDataLength;
   double _imageDataLength;
+
+  String _orientation;
+
+  Uint8List _rotateImgData;
+
   @override
   void initState() {
     super.initState();
@@ -38,18 +40,24 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future getImage() async {
-    var image = await ImagePicker.pickImage(source: ImageSource.gallery);
+    var image = await ImagePicker().getImage(source: ImageSource.camera);
 
+     String orientation =
+        await FlutterImageExpansion.getImageOrientation(imagePath: image.path);
+
+    Uint8List rotateImgData =
+    await FlutterImageExpansion.rotateImg(imagePath: image.path,degree: int.parse(orientation));
+
+    print("orientation----$orientation");
     ImageExpansionBean bean = await FlutterImageExpansion.imageQuality(
         imagePath: image.path, quality: 1);
 
-
-
     setState(() {
-      _image = image;
       _originalImageBean = bean;
       _imageBean = bean;
-
+      _orientation = orientation;
+      _image = image;
+      _rotateImgData = rotateImgData;
       _imageMaxDataLength = bean.dataLength.toDouble();
       _imageDataLength = bean.dataLength.toDouble();
 
@@ -75,14 +83,22 @@ class _MyAppState extends State<MyApp> {
           buildRow(),
           Container(
             child: Text(
-                "图片大小${_imageBean?.dataLength}\n图片质量:$_sliderValue\n图片高度:${_imageBean?.imageHeight}\n图片宽度:${_imageBean?.imageWidth}"),
+                "图片大小${_imageBean?.dataLength}\n"
+                    "图片质量:$_sliderValue\n"
+                    "图片高度:${_imageBean?.imageHeight}\n"
+                    "图片宽度:${_imageBean?.imageWidth}"),
           ),
           Expanded(
             child: _imageBean == null
                 ? (_image == null
                     ? Text('No image selected.')
-                    : Image.file(_image))
+                    : Image.file(File(_image.path)))
                 : Image.memory(_imageBean.imageData),
+          ),
+          Expanded(
+            child: _rotateImgData == null
+                ? Text('No image selected.')
+                : Image.memory(_rotateImgData),
           ),
           _originalImageBean == null
               ? Container()
@@ -210,7 +226,11 @@ class _MyAppState extends State<MyApp> {
           onPressed: () async {
             Map map = await FlutterImageExpansion.getImageAllInfo(
                 imageData: _imageBean.imageData);
-            showMyMaterialDialog(context, "详情: ${map.toString()}");
+            String orientation =
+                await FlutterImageExpansion.getImageOrientation(
+                    imageData: _imageBean.imageData);
+            showMyMaterialDialog(
+                context, "详情: ${map.toString()} orientation=$orientation");
           },
         ),
       ],

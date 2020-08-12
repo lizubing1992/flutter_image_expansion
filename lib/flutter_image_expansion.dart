@@ -132,6 +132,48 @@ class FlutterImageExpansion {
     return latitude;
   }
 
+  /// 获取图片旋转角度
+  /// [imageData] 原始图片data.如果有,则不取imagePath的数据
+  /// [imagePath] 原始图片路径.没有imageData,才会取imagePath路径下的数据
+  /// imagePath：图片的绝对路径
+  static Future<String> getImageOrientation({
+    Uint8List imageData,
+    String imagePath,
+  }) async {
+    final Map<String, dynamic> params = <String, dynamic>{};
+    if (imagePath != null) {
+      params["imagePath"] = imagePath;
+    }
+    if (imageData != null) {
+      params["imageData"] = imageData;
+    }
+    final String orientation =
+        await _channel.invokeMethod('getImageOrientation', params);
+    return orientation;
+  }
+
+  /// 获取旋转之后图片数据
+  /// [imageData] 原始图片data.如果有,则不取imagePath的数据
+  /// [imagePath] 原始图片路径.没有imageData,才会取imagePath路径下的数据
+  /// imagePath：图片的绝对路径
+  static Future<Uint8List> rotateImg({
+    Uint8List imageData,
+    String imagePath,
+    int degree = 0,
+  }) async {
+    final Map<String, dynamic> params = <String, dynamic>{};
+    if (imagePath != null) {
+      params["imagePath"] = imagePath;
+    }
+    if (imageData != null) {
+      params["imageData"] = imageData;
+    }
+    params["degree"] = degree;
+    final Uint8List rotateImg =
+        await _channel.invokeMethod('getRotateImg', params);
+    return rotateImg;
+  }
+
   /// 获取图片拍照时间
   /// [imageData] 原始图片data.如果有,则不取imagePath的数据
   /// [imagePath] 原始图片路径.没有imageData,才会取imagePath路径下的数据
@@ -170,7 +212,7 @@ class FlutterImageExpansion {
       params["imageData"] = imageData;
     }
     var fromRes = await _channel.invokeMethod('getImageAllInfo', params);
-    return transferData(fromRes); 
+    return transferData(fromRes);
   }
 
   /// 保存信息到图片
