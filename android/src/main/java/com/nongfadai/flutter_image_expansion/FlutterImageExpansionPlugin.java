@@ -3,7 +3,6 @@ package com.nongfadai.flutter_image_expansion;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
-import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -42,11 +41,11 @@ public class FlutterImageExpansionPlugin implements MethodCallHandler {
         }
 
         byte[] imageDataBytes = call.argument("imageData");
-
+        String imagePath = "";
 
         if (imageDataBytes == null || imageDataBytes.length == 0) {
 
-            String imagePath = call.argument("imagePath").toString();
+             imagePath = call.argument("imagePath").toString();
 
             imageDataBytes = readFile(imagePath);
         }
@@ -58,11 +57,11 @@ public class FlutterImageExpansionPlugin implements MethodCallHandler {
 //
 //            if (keepExif) {
         String orientation = BitmapUtil.getImageOrientation(imageDataBytes);
-        Log.d("mrliuys 获取orientation: ", orientation);
+//        Log.d("mrliuys 获取orientation: ", orientation);
 
         imageExif = BitmapUtil.getImageAllInfoFromData(imageDataBytes);
 
-        Log.d("mrliuys 获取exif1: ", imageExif.toString());
+//        Log.d("mrliuys 获取exif1: ", imageExif.toString());
 //            }
 //
 //        }
@@ -154,10 +153,10 @@ public class FlutterImageExpansionPlugin implements MethodCallHandler {
         } else if (call.method.equals("getImagePhotoTime")) {
             result.success(BitmapUtil.getImagePhotoTimeFromData(imageDataBytes));
 
-        }else if (call.method.equals("getRotateImg")) {
-            result.success(getRotateImg(imageDataBytes,(int)call.argument("degree")));
+        } else if (call.method.equals("getRotateImg")) {
+            result.success(getRotateImg(imageDataBytes, (int) call.argument("degree")));
 
-        }  else if (call.method.equals("getImageOrientation")) {
+        } else if (call.method.equals("getImageOrientation")) {
             result.success(BitmapUtil.getImageOrientation(imageDataBytes));
         } else if (call.method.equals("getImageAllInfo")) {
             result.success(BitmapUtil.getImageAllInfoFromData(imageDataBytes));
@@ -166,8 +165,8 @@ public class FlutterImageExpansionPlugin implements MethodCallHandler {
             if (call.hasArgument("map")) {
                 Map<String, String> map = call.argument("map");
 
-                Log.d("mrliuys 保存图片信息: ", map.toString());
-//                result.success(BitmapUtil.saveImageInfo(imagePath, map));
+//                Log.d("mrliuys 保存图片信息: ", map.toString());
+                result.success(BitmapUtil.saveImageInfo(imagePath, map));
             } else {
                 result.success(false);
             }
@@ -177,7 +176,7 @@ public class FlutterImageExpansionPlugin implements MethodCallHandler {
     }
 
 
-    private byte[] getRotateImg(byte[] data,int degree){
+    private byte[] getRotateImg(byte[] data, int degree) {
         Bitmap originBitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
         Bitmap rotateBitmap = BitmapUtil.rotateBitmap(originBitmap, degree);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();

@@ -174,7 +174,7 @@ public class BitmapUtil {
         }
 
 
-        Log.d("mrliuys 获取图片信息: ", res.toString());
+//        Log.d("mrliuys 获取图片信息: ", res.toString());
 
         return res;
     }
@@ -197,10 +197,10 @@ public class BitmapUtil {
                     degree = 270;
                     break;
             }
-            Log.d("获取图片信息图片旋转角度: ", degree+"");
+//            Log.d("获取图片信息图片旋转角度: ", degree+"");
         } catch (IOException e) {
             e.printStackTrace();
-            Log.d("获取图片信息图片旋转角度IOException", e.getLocalizedMessage());
+//            Log.d("获取图片信息图片旋转角度IOException", e.getLocalizedMessage());
         }
         return degree + "";
     }

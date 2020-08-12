@@ -45,6 +45,8 @@ class _MyAppState extends State<MyApp> {
      String orientation =
         await FlutterImageExpansion.getImageOrientation(imagePath: image.path);
 
+    Map map = await FlutterImageExpansion.getImageAllInfo(imagePath: image.path);
+    await FlutterImageExpansion.saveImageInfo(imagePath: image.path, map: map);
     Uint8List rotateImgData =
     await FlutterImageExpansion.rotateImg(imagePath: image.path,degree: int.parse(orientation));
 
