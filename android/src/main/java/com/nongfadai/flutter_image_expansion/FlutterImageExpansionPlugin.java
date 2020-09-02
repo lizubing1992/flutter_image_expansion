@@ -166,9 +166,13 @@ public class FlutterImageExpansionPlugin implements MethodCallHandler {
                 Map<String, String> map = call.argument("map");
 
 //                Log.d("mrliuys 保存图片信息: ", map.toString());
-                result.success(BitmapUtil.saveImageInfo(imagePath, map));
+                if(BitmapUtil.saveImageInfo(imagePath, map)){
+                    result.success("success");
+                }else{
+                    result.success("failure");
+                }
             } else {
-                result.success(false);
+                result.success("failure");
             }
         } else {
             result.notImplemented();

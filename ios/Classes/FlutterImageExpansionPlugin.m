@@ -150,14 +150,15 @@
         NSDictionary *map = call.arguments[@"map"];
         if (map) {
             
-            imageData = [BitmapUtil saveImageInfoFromData:imageData map:map];
+           NSData *saveImageData = [BitmapUtil saveImageInfoFromData:imageData map:map];
             
-            result(@{@"imageData":[FlutterStandardTypedData typedDataWithBytes:imageData],
-                    @"dataLength":@(imageData.length)});
-            
+            if([imageData isEqualToData:saveImageData]){
+                result(@"success");
+            }else{
+                result(@"failure");
+            }
         }else {
-            result(@{@"imageData":[FlutterStandardTypedData typedDataWithBytes:imageData],
-                    @"dataLength":@(imageData.length)});
+            result(@"failure");
         }
 
     } else {

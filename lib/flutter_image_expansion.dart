@@ -218,7 +218,7 @@ class FlutterImageExpansion {
   /// 保存信息到图片
   /// [imageData] 原始图片data.如果有,则不取imagePath的数据
   /// [imagePath] 原始图片路径.没有imageData,才会取imagePath路径下的数据
-  static Future<bool> saveImageInfo({
+  static Future<String> saveImageInfo({
     Uint8List imageData,
     String imagePath,
     Map<String, dynamic> map,
@@ -233,7 +233,7 @@ class FlutterImageExpansion {
     if (map != null) {
       params["map"] = map;
     }
-    bool res = await _channel.invokeMethod('saveImageInfo', params);
+    String res = await _channel.invokeMethod('saveImageInfo', params);
     return res;
   }
 

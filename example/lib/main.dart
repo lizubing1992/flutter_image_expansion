@@ -42,24 +42,15 @@ class _MyAppState extends State<MyApp> {
   Future getImage() async {
     var image = await ImagePicker().getImage(source: ImageSource.camera);
 
-     String orientation =
-        await FlutterImageExpansion.getImageOrientation(imagePath: image.path);
-
     Map map = await FlutterImageExpansion.getImageAllInfo(imagePath: image.path);
     await FlutterImageExpansion.saveImageInfo(imagePath: image.path, map: map);
-    Uint8List rotateImgData =
-    await FlutterImageExpansion.rotateImg(imagePath: image.path,degree: int.parse(orientation));
-
-    print("orientation----$orientation");
     ImageExpansionBean bean = await FlutterImageExpansion.imageQuality(
         imagePath: image.path, quality: 1);
 
     setState(() {
       _originalImageBean = bean;
       _imageBean = bean;
-      _orientation = orientation;
       _image = image;
-      _rotateImgData = rotateImgData;
       _imageMaxDataLength = bean.dataLength.toDouble();
       _imageDataLength = bean.dataLength.toDouble();
 
